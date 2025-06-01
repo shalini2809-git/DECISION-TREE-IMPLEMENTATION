@@ -1,0 +1,45 @@
+# Import necessary libraries
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier, export_graphviz
+from sklearn.metrics import accuracy_score, classification_report
+import matplotlib.pyplot as plt
+from sklearn import tree
+import graphviz
+
+# Load the Iris dataset
+iris = load_iris()
+X = iris.data
+y = iris.target
+feature_names = iris.feature_names
+class_names = iris.target_names
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Build the Decision Tree model
+dt_model = DecisionTreeClassifier(max_depth=3, random_state=42)
+dt_model.fit(X_train, y_train)
+
+# Make predictions
+y_pred = dt_model.predict(X_test)
+
+# Evaluate the model
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.2f}")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, target_names=class_names))
+
+# Visualize the Decision Tree
+plt.figure(figsize=(12, 8))
+tree.plot_tree(dt_model, feature_names=feature_names, class_names=class_names, filled=True, rounded=True)
+plt.title("Decision Tree for Iris Dataset")
+plt.show()
+
+# Export the tree to a Graphviz format for better visualization
+dot_data = export_graphviz(dt_model, out_file=None, feature_names=feature_names, 
+                           class_names=class_names, filled=True, rounded=True, special_characters=True)
+graph = graphviz.Source(dot_data)
+graph.render("iris_decision_tree", view=True, format="png")
